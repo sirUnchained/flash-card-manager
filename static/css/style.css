@@ -81,7 +81,7 @@ h3 {
 
 /* ===== LAYOUT ===== */
 .container {
-    display: flex;
+    /* display: flex; */
     flex: 1;
     gap: 24px;
     flex-wrap: nowrap;
@@ -242,12 +242,13 @@ h3 {
 
 /* ===== FLASHCARDS GRID ===== */
 .cards-grid {
-    display: grid;
+    /* display: grid; */
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 18px;
 }
 
 .flashcard {
+    margin-top: 30px;
     background: #2a2a2a;
     border-radius: 14px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
@@ -260,7 +261,7 @@ h3 {
 }
 
 .flashcard:hover {
-    transform: scale(1.02);
+    transform: scale(0.99);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
 }
 
