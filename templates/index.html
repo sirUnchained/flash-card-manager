@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcard Manager</title>
+    <!-- MathJax -->
     <script>
         window.MathJax = {
             tex: {
@@ -16,6 +17,9 @@
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+    <!-- Markdown & DOMPurify -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -185,7 +189,6 @@
             align-items: center;
             overflow-y: auto;
             word-break: break-word;
-            white-space: pre-wrap;  /* حفظ خطوط جدید */
         }
         .flashcard-front {
             background: #333;
@@ -206,6 +209,70 @@
         .flashcard-back.ltr {
             direction: ltr;
             text-align: left;
+        }
+        /* استایل‌های Markdown داخل کارت */
+        .flashcard-back p {
+            margin: 0 0 0.5em 0;
+        }
+        .flashcard-back p:last-child {
+            margin-bottom: 0;
+        }
+        .flashcard-back ul, .flashcard-back ol {
+            padding-left: 1.5em;
+            margin: 0.5em 0;
+        }
+        .flashcard-back code {
+            background: #222;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .flashcard-back pre {
+            background: #222;
+            padding: 0.8em;
+            border-radius: 6px;
+            overflow-x: auto;
+            width: 100%;
+        }
+        .flashcard-back blockquote {
+            border-left: 3px solid #4a6fa5;
+            padding-left: 1em;
+            margin: 0.5em 0;
+            color: #bbb;
+        }
+        .flashcard-back a {
+            color: #6a9fd8;
+            text-decoration: none;
+        }
+        .flashcard-back a:hover {
+            text-decoration: underline;
+        }
+        .flashcard-back img {
+            max-width: 100%;
+            border-radius: 4px;
+        }
+        .flashcard-back table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 0.5em 0;
+        }
+        .flashcard-back th, .flashcard-back td {
+            border: 1px solid #555;
+            padding: 0.3em 0.6em;
+        }
+        .flashcard-back th {
+            background: #2a2a2a;
+        }
+        /* جهت RTL برای المان‌های Markdown */
+        .flashcard-back.rtl ul, .flashcard-back.rtl ol {
+            padding-right: 1.5em;
+            padding-left: 0;
+        }
+        .flashcard-back.rtl blockquote {
+            border-left: none;
+            border-right: 3px solid #4a6fa5;
+            padding-right: 1em;
+            padding-left: 0;
         }
         .card-actions {
             position: absolute;
@@ -371,7 +438,7 @@
             <select id="modalCategory"></select>
             <label for="modalFront">Front (use $...$ for LaTeX)</label>
             <textarea id="modalFront" rows="2"></textarea>
-            <label for="modalBack">Back (description)</label>
+            <label for="modalBack">Back (description — supports Markdown)</label>
             <textarea id="modalBack" rows="3"></textarea>
             <div class="form-actions">
                 <button class="btn-cancel" id="modalCancel">Cancel</button>
@@ -405,6 +472,14 @@
         const modalCancel = document.getElementById('modalCancel');
         const toastEl = document.getElementById('toast');
 
+        // ---------- تنظیمات marked ----------
+        marked.setOptions({
+            breaks: true,          // تبدیل line break به <br>
+            gfm: true,             // GitHub Flavored Markdown
+            headerIds: false,
+            mangle: false
+        });
+
         // ---------- Helpers ----------
         function detectDirection(text) {
             const rtlRegex = /[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
@@ -415,7 +490,24 @@
             return text && text.startsWith('$') && text.endsWith('$');
         }
 
-        // --- جدید: تبدیل خطوط جدید به <br> و escape کردن ---
+        // تبدیل Markdown به HTML با پاک‌سازی امنیتی
+        function renderMarkdown(text) {
+            if (!text) return '';
+            // اگر LaTeX است، آن را بدون تغییر برگردان (برای قسمت جلو)
+            // ولی این تابع فقط برای توضیحات استفاده می‌شود، اما برای امنیت چک می‌کنیم
+            // (در قسمت جلو از isLatex جداگانه استفاده می‌شود)
+            const rawHtml = marked.parse(text);
+            return DOMPurify.sanitize(rawHtml, {
+                ADD_TAGS: ['math', 'svg', 'path', 'mrow', 'mi', 'mo', 'mn', 'msup', 'msub', 'mfrac', 'msqrt', 'mroot', 'mtable', 'mtd', 'mtr'],
+                ADD_ATTR: ['xmlns', 'viewBox', 'stroke', 'fill', 'fontfamily', 'fontsize', 'mathcolor', 'mathvariant']
+            });
+        }
+
+        // برای قسمت جلو (متن معمولی) – فقط escape و خطوط جدید
+        function renderPlainText(text) {
+            return nl2br(escapeHtml(text));
+        }
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
@@ -424,10 +516,6 @@
 
         function nl2br(text) {
             return text.replace(/\n/g, '<br>');
-        }
-
-        function renderTextContent(text) {
-            return nl2br(escapeHtml(text));
         }
 
         function showToast(msg) {
@@ -567,17 +655,26 @@
                 frontDiv.className = 'flashcard-front';
                 let frontContent = card.front || '';
                 if (isLatex(frontContent)) {
-                    frontDiv.innerHTML = frontContent;
+                    frontDiv.innerHTML = frontContent; // MathJax
                 } else {
-                    frontDiv.innerHTML = renderTextContent(frontContent);
+                    frontDiv.innerHTML = renderPlainText(frontContent);
                 }
 
-                // Back
+                // Back (با پشتیبانی Markdown)
                 const backDiv = document.createElement('div');
                 backDiv.className = 'flashcard-back';
-                const dir = detectDirection(card.back || '');
+                const backText = card.back || '';
+                const dir = detectDirection(backText);
                 backDiv.classList.add(dir);
-                backDiv.innerHTML = renderTextContent(card.back || '');
+                // اگر محتوای پشت با $ شروع و ختم شد، آن را به‌عنوان LaTeX در نظر بگیریم؟
+                // اما چون کاربر ممکن است ترکیبی از Markdown و LaTeX داشته باشد، تصمیم گرفتم
+                // که اگر کل محتوا با $...$ باشد، آن را LaTeX در نظر بگیریم وگرنه Markdown.
+                // (برای پشت کارت معمولاً توضیحات متنی است، ولی این امکان را هم می‌دهیم)
+                if (isLatex(backText)) {
+                    backDiv.innerHTML = backText; // MathJax بعداً آن را می‌گیرد
+                } else {
+                    backDiv.innerHTML = renderMarkdown(backText);
+                }
 
                 inner.appendChild(frontDiv);
                 inner.appendChild(backDiv);
@@ -616,6 +713,7 @@
             cardsContainer.innerHTML = '';
             cardsContainer.appendChild(grid);
 
+            // رندر مجدد MathJax برای هر دو بخش LaTeX و Markdown (که ممکن است شامل فرمول باشد)
             if (window.MathJax && window.MathJax.typesetPromise) {
                 MathJax.typesetPromise().catch(() => {});
             }
