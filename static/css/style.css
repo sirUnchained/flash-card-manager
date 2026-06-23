@@ -1,0 +1,707 @@
+/* ===== RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #1a1a1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    padding: 12px 16px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+    color: #f0f0f0;
+    font-weight: 300;
+}
+
+/* ===== HEADER ===== */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.app-header h1 {
+    font-size: 1.6rem;
+    flex: 1;
+    min-width: 150px;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.hamburger:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.hamburger span {
+    display: block;
+    width: 26px;
+    height: 3px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+.hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+.header-spacer {
+    flex: 0 0 0;
+}
+
+/* ===== LAYOUT ===== */
+.container {
+    display: flex;
+    flex: 1;
+    gap: 24px;
+    flex-wrap: nowrap;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    flex: 0 0 260px;
+    background: #2a2a2a;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    height: fit-content;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.sidebar-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar h2 {
+    font-size: 1.2rem;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+.category-list {
+    list-style: none;
+    flex: 1;
+}
+
+.category-list li {
+    padding: 10px 14px;
+    margin: 6px 0;
+    background: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.category-list li:hover {
+    background: #3d3d3d;
+}
+
+.category-list li.active {
+    background: #4a6fa5;
+    color: white;
+}
+
+.category-list .cat-name {
+    flex: 1;
+    word-break: break-word;
+}
+
+.category-list .del-cat {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 6px;
+    transition: color 0.2s;
+}
+
+.category-list .del-cat:hover {
+    color: #ff6b6b;
+}
+
+.add-cat-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.add-cat-form input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background: #222;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+}
+
+.add-cat-form input:focus {
+    outline: 2px solid #4a6fa5;
+    border-color: transparent;
+}
+
+.add-cat-form button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4a6fa5;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background 0.2s;
+}
+
+.add-cat-form button:hover {
+    background: #5a7fb5;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+    flex: 1;
+    min-width: 0;
+    /* جلوگیری از سرریز */
+}
+
+.cards-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cards-header h2 {
+    font-size: 1.3rem;
+    word-break: break-word;
+}
+
+.btn-add {
+    background: #4a6fa5;
+    border: none;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.btn-add:hover {
+    background: #5a7fb5;
+}
+
+.btn-add:active {
+    transform: scale(0.96);
+}
+
+.btn-add:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== FLASHCARDS GRID ===== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.flashcard {
+    background: #2a2a2a;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    perspective: 1000px;
+    height: 220px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    touch-action: manipulation;
+}
+
+.flashcard:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    word-break: break-word;
+}
+
+.flashcard-front {
+    background: #333;
+    color: #f0f0f0;
+    border: 1px solid #444;
+}
+
+.flashcard-back {
+    background: #3a3a3a;
+    color: #f0f0f0;
+    transform: rotateY(180deg);
+    border: 1px solid #555;
+    text-align: left;
+}
+
+.flashcard-back.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
+.flashcard-back.ltr {
+    direction: ltr;
+    text-align: left;
+}
+
+/* Markdown styles inside back */
+.flashcard-back p {
+    margin: 0 0 0.5em 0;
+}
+
+.flashcard-back p:last-child {
+    margin-bottom: 0;
+}
+
+.flashcard-back ul,
+.flashcard-back ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+}
+
+.flashcard-back code {
+    background: #222;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.flashcard-back pre {
+    background: #222;
+    padding: 0.8em;
+    border-radius: 6px;
+    overflow-x: auto;
+    width: 100%;
+}
+
+.flashcard-back blockquote {
+    border-left: 3px solid #4a6fa5;
+    padding-left: 1em;
+    margin: 0.5em 0;
+    color: #bbb;
+}
+
+.flashcard-back a {
+    color: #6a9fd8;
+    text-decoration: none;
+}
+
+.flashcard-back a:hover {
+    text-decoration: underline;
+}
+
+.flashcard-back img {
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+.flashcard-back table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5em 0;
+}
+
+.flashcard-back th,
+.flashcard-back td {
+    border: 1px solid #555;
+    padding: 0.3em 0.6em;
+}
+
+.flashcard-back th {
+    background: #2a2a2a;
+}
+
+.flashcard-back.rtl ul,
+.flashcard-back.rtl ol {
+    padding-right: 1.5em;
+    padding-left: 0;
+}
+
+.flashcard-back.rtl blockquote {
+    border-left: none;
+    border-right: 3px solid #4a6fa5;
+    padding-right: 1em;
+    padding-left: 0;
+}
+
+/* ===== CARD ACTIONS ===== */
+.card-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+}
+
+.card-actions button {
+    background: rgba(0, 0, 0, 0.65);
+    border: none;
+    color: #ddd;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    touch-action: manipulation;
+}
+
+.card-actions button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.card-actions button:active {
+    transform: scale(0.9);
+}
+
+.card-actions .del-card {
+    color: #e74c3c;
+}
+
+.card-actions .del-card:hover {
+    color: #ff6b6b;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-msg {
+    color: #888;
+    font-style: italic;
+    margin-top: 40px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: #2a2a2a;
+    border-radius: 18px;
+    padding: 28px 24px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8);
+    color: #e0e0e0;
+}
+
+.modal h3 {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.modal label {
+    display: block;
+    margin: 14px 0 4px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.modal input,
+.modal textarea,
+.modal select {
+    width: 100%;
+    padding: 10px 14px;
+    background: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.modal input:focus,
+.modal textarea:focus,
+.modal select:focus {
+    outline: 2px solid #4a6fa5;
+    border-color: transparent;
+}
+
+.modal textarea {
+    min-height: 60px;
+}
+
+.modal .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.modal .form-actions button {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.modal .form-actions button:active {
+    transform: scale(0.96);
+}
+
+.modal .btn-save {
+    background: #4a6fa5;
+    color: white;
+}
+
+.modal .btn-save:hover {
+    background: #5a7fb5;
+}
+
+.modal .btn-cancel {
+    background: #444;
+    color: #ccc;
+}
+
+.modal .btn-cancel:hover {
+    background: #555;
+}
+
+/* ===== TOAST ===== */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #e0e0e0;
+    padding: 12px 28px;
+    border-radius: 40px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 2000;
+    font-size: 1rem;
+    max-width: 90%;
+    text-align: center;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+/* ============================================================ */
+/* ===================== RESPONSIVE ============================ */
+/* ============================================================ */
+
+/* ---------- تبلت و موبایل بزرگ ---------- */
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .sidebar {
+        flex: 1 1 auto;
+        width: 100%;
+        max-height: none;
+        padding: 16px;
+        border-radius: 12px;
+        display: none;
+        /* پیش‌فرض مخفی در موبایل */
+    }
+
+    .sidebar.open {
+        display: block;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .app-header h1 {
+        font-size: 1.4rem;
+    }
+
+    .cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 14px;
+    }
+
+    .flashcard {
+        height: 190px;
+    }
+}
+
+/* ---------- موبایل کوچک ---------- */
+@media (max-width: 480px) {
+    body {
+        padding: 8px 10px 16px;
+    }
+
+    .app-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .hamburger span {
+        width: 22px;
+        height: 2.5px;
+    }
+
+    .sidebar {
+        padding: 14px;
+    }
+
+    .category-list li {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .add-cat-form input {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+
+    .add-cat-form button {
+        padding: 8px 14px;
+        font-size: 1.1rem;
+    }
+
+    .cards-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .btn-add {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .flashcard {
+        height: 170px;
+    }
+
+    .flashcard-front,
+    .flashcard-back {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+
+    .modal {
+        padding: 20px 16px;
+    }
+
+    .modal h3 {
+        font-size: 1.2rem;
+    }
+
+    .modal .form-actions button {
+        padding: 8px 20px;
+        font-size: 0.95rem;
+    }
+
+    .toast {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        bottom: 20px;
+    }
+}
+
+/* ---------- نمایش سایدبار در حالت دسکتاپ ---------- */
+@media (min-width: 901px) {
+    .sidebar {
+        display: block !important;
+    }
+
+    .hamburger {
+        display: none !important;
+    }
+}
